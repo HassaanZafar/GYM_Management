@@ -15,7 +15,6 @@ public class ConnectionProvider {
                    );
            return con;
         }
-    
         catch (Exception e)
         {
             return null;

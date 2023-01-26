@@ -1,11 +1,15 @@
 
 import java.awt.Color;
+import java.sql.Connection;
+import java.sql.*;
 import javax.swing.JOptionPane;
+import project.ConnectionProvider;
+
 public class login extends javax.swing.JFrame {
   
     public login() {
         initComponents();
-        jLabel2.setVisible(false);
+        
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -13,7 +17,6 @@ public class login extends javax.swing.JFrame {
 
         jButton1 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
         jPasswordField1 = new javax.swing.JPasswordField();
         jButton2 = new javax.swing.JButton();
@@ -37,21 +40,11 @@ public class login extends javax.swing.JFrame {
         jLabel1.setText("LOGIN");
         getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 250, 173, -1));
 
-        jLabel2.setBackground(new java.awt.Color(255, 0, 0));
-        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(255, 0, 0));
-        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/close.png"))); // NOI18N
-        jLabel2.setText("Incorrect Username or Password");
-        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 320, -1, -1));
-
         jTextField1.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jTextField1.setText("Enter Username");
         jTextField1.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 jTextField1FocusGained(evt);
-            }
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                jTextField1FocusLost(evt);
             }
         });
         getContentPane().add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 350, 310, -1));
@@ -60,14 +53,6 @@ public class login extends javax.swing.JFrame {
         jPasswordField1.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 jPasswordField1FocusGained(evt);
-            }
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                jPasswordField1FocusLost(evt);
-            }
-        });
-        jPasswordField1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jPasswordField1ActionPerformed(evt);
             }
         });
         getContentPane().add(jPasswordField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 390, 310, -1));
@@ -102,16 +87,36 @@ public class login extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-    if(jTextField1.getText().equals("gym")&& jPasswordField1.getText().equals("admin")) 
-    {
-        setVisible(false);
-        new home().setVisible(true);
+
+        try{
+             Connection con=ConnectionProvider.getCon();
+             String username=jTextField1.getText();
+             String password=jPasswordField1.getText();
+             
+             Statement st=con.createStatement();
+             String query="Select * from login where username='"+username+"' and password='"+password+"'" ;
+             ResultSet rs=st.executeQuery(query);
+             
+             if(rs.next())
+             {
+                 setVisible(false);
+                 new home().setVisible(true); 
+             }
+             else
+             {
+                 JOptionPane.showMessageDialog(this,"Incorrect username or password!!!");
+                 jTextField1.setText("");
+                 jPasswordField1.setText("");
+             }  
+             con.close();
+        }catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
     }//GEN-LAST:event_jButton2ActionPerformed
- else
-        jLabel2.setVisible(true);
-    }
+ 
     private void jTextField1FocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextField1FocusGained
-         jLabel2.setVisible(false);
+         
        if(jTextField1.getText().equals("Enter Username"))
        {
            jTextField1.setText("");
@@ -119,32 +124,14 @@ public class login extends javax.swing.JFrame {
        }
     }//GEN-LAST:event_jTextField1FocusGained
 
-    private void jTextField1FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextField1FocusLost
-       jLabel2.setVisible(false);
-        if(jTextField1.getText().equals(""))
-        {
-            
-               jTextField1.setForeground(new Color(0,110,221));
-        }
-    }//GEN-LAST:event_jTextField1FocusLost
-
     private void jPasswordField1FocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jPasswordField1FocusGained
-            jLabel2.setVisible(false);
+            
        if(jPasswordField1.getText().equals("Enter Password"))
        {
            jPasswordField1.setText("");
            jPasswordField1.setForeground(new Color(0,110,221));
        }
     }//GEN-LAST:event_jPasswordField1FocusGained
-
-    private void jPasswordField1FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jPasswordField1FocusLost
-        
-        if(jPasswordField1.getText().equals(""))
-        {
-             jPasswordField1.setText("Enter Password");
-               jPasswordField1.setForeground(new Color(0,110,221));
-        }
-    }//GEN-LAST:event_jPasswordField1FocusLost
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
  int a=JOptionPane.showConfirmDialog(null,"Do you really want to Exit?","Please Select",JOptionPane.YES_NO_OPTION);
@@ -165,10 +152,6 @@ if(a==0)
         }
     }//GEN-LAST:event_jCheckBox1ActionPerformed
 
-    private void jPasswordField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jPasswordField1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jPasswordField1ActionPerformed
-
     public static void main(String args[]) {
       
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -182,7 +165,6 @@ if(a==0)
     private javax.swing.JButton jButton2;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JPasswordField jPasswordField1;
